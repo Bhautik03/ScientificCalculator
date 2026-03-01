@@ -1,0 +1,5 @@
+/home/bhautik/IIITB/Sem 2/SPE/Mini_Project/ScientificCalculator/build/CMakeFiles/calculator.dir
+/home/bhautik/IIITB/Sem 2/SPE/Mini_Project/ScientificCalculator/build/CMakeFiles/test_calculator.dir
+/home/bhautik/IIITB/Sem 2/SPE/Mini_Project/ScientificCalculator/build/CMakeFiles/test.dir
+/home/bhautik/IIITB/Sem 2/SPE/Mini_Project/ScientificCalculator/build/CMakeFiles/edit_cache.dir
+/home/bhautik/IIITB/Sem 2/SPE/Mini_Project/ScientificCalculator/build/CMakeFiles/rebuild_cache.dir

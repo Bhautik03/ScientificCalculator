@@ -24,7 +24,7 @@ long long factorial(int x) {
 
 double naturalLog(double x) {
     if (x <= 0) {
-        throw invalid_argument("Natural log defined only for positive numbers");
+        throw invalid_argument("Natural Log defined only for positive numbers");
     }
     return log(x);
 }

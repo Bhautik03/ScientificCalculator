@@ -6,7 +6,7 @@ using namespace std;
 
 double squareRoot(double x) {
     if (x < 0) {
-        throw invalid_argument("Cannot calculate square root of negative number");
+        throw invalid_argument("Cannot Calculate square root of negative number");
     }
     return sqrt(x);
 }

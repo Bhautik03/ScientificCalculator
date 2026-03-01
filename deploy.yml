@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Pull Docker Image
+      command: docker pull bhautik03/scientific-calculator
+
+    - name: Run Docker Container
+      command: docker run -d bhautik03/scientific-calculator

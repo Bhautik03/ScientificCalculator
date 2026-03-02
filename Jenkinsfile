@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)   // ✅ prevents automatic checkout
+    }
+
     environment {
         IMAGE_NAME = "bhautik03/scientific-calculator"
         IMAGE_TAG  = "${BUILD_NUMBER}"

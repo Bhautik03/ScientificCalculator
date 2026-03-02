@@ -118,14 +118,7 @@ pipeline {
         failure {
             emailext(
                 subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                Build or Deployment FAILED!
-
-                Job: ${env.JOB_NAME}
-                Build Number: ${env.BUILD_NUMBER}
-
-                Failed Stage: ${env.FAILED_STAGE}
-                """,
+                body: "Build or Deployment FAILED!",
                 to: "bhautikv03@gmail.com"
             )
         }

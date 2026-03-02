@@ -4,7 +4,7 @@
 
 using namespace std;
 
-double squareRoo(double x) {
+double squareRoot(double x) {
     if (x < 0) {
         throw invalid_argument("Cannot Calculate square root of negative number");
     }

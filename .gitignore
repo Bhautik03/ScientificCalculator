@@ -1,4 +1,15 @@
-build/
+# Ignore build directory completely
+build
+
+# Ignore all CMake generated files anywhere
 CMakeCache.txt
-CMakeFiles/
+CMakeFiles
+cmake_install.cmake
+Makefile
+
+# Ignore git
+.git
+.gitignore
+
+# Ignore compiled objects
 *.o

@@ -16,20 +16,22 @@ pipeline {
 
         stage('Tool Install') {
             steps {
-                sh 'cmake --version'
-                sh 'docker --version'
-                sh 'ansible --version'
+                sh '''
+                    cmake --version
+                    docker --version
+                    ansible --version
+                '''
             }
         }
 
         stage('Build') {
             steps {
                 sh '''
-                rm -rf build
-                mkdir build
-                cd build
-                cmake ..
-                make
+                    rm -rf build
+                    mkdir build
+                    cd build
+                    cmake ..
+                    make
                 '''
             }
         }
@@ -37,8 +39,8 @@ pipeline {
         stage('Test') {
             steps {
                 sh '''
-                cd build
-                ctest --output-on-failure
+                    cd build
+                    ctest --output-on-failure
                 '''
             }
         }
@@ -46,7 +48,7 @@ pipeline {
         stage('Docker Build') {
             steps {
                 sh '''
-                docker build -t $IMAGE_NAME:$IMAGE_TAG .
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
@@ -59,8 +61,9 @@ pipeline {
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
                     sh '''
-                    echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
-                    docker push $IMAGE_NAME:$IMAGE_TAG
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        docker logout
                     '''
                 }
             }
@@ -69,7 +72,7 @@ pipeline {
         stage('Deploy with Ansible') {
             steps {
                 sh '''
-                ansible-playbook -i inventory deploy.yml
+                    ansible-playbook -i inventory deploy.yml
                 '''
             }
         }
@@ -80,10 +83,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo "Pipeline executed successfully!"
+            echo "✅ Pipeline executed successfully!"
         }
         failure {
-            echo "Pipeline failed!"
+            echo "❌ Pipeline failed!"
         }
     }
 }

@@ -14,33 +14,11 @@ pipeline {
             }
         }
 
-        stage('Tool Install') {
+        stage('Tool Check') {
             steps {
                 sh '''
-                    cmake --version
                     docker --version
                     ansible --version
-                '''
-            }
-        }
-
-        stage('Build') {
-            steps {
-                sh '''
-                    rm -rf build
-                    mkdir build
-                    cd build
-                    cmake ..
-                    make
-                '''
-            }
-        }
-
-        stage('Test') {
-            steps {
-                sh '''
-                    cd build
-                    ctest --output-on-failure
                 '''
             }
         }
@@ -49,6 +27,14 @@ pipeline {
             steps {
                 sh '''
                     docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                '''
+            }
+        }
+
+        stage('Run Tests in Container') {
+            steps {
+                sh '''
+                    docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} ctest --test-dir build
                 '''
             }
         }
@@ -71,9 +57,7 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                sh '''
-                    ansible-playbook -i inventory deploy.yml
-                '''
+                sh 'ansible-playbook -i inventory deploy.yml'
             }
         }
     }
@@ -81,12 +65,6 @@ pipeline {
     post {
         always {
             cleanWs()
-        }
-        success {
-            echo "✅ Pipeline executed successfully!"
-        }
-        failure {
-            echo "❌ Pipeline failed!"
         }
     }
 }

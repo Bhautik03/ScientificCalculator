@@ -19,6 +19,9 @@ RUN cd /usr/src/gtest && \
 # Copy project files
 COPY . .
 
+# 🔴 IMPORTANT FIX: remove Jenkins-generated CMake artifacts
+RUN rm -rf build CMakeCache.txt CMakeFiles
+
 # Build the project using modern CMake syntax
 RUN cmake -S . -B build && \
     cmake --build build

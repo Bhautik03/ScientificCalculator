@@ -25,6 +25,5 @@ RUN rm -rf build CMakeCache.txt CMakeFiles
 # Build the project using modern CMake syntax
 RUN cmake -S . -B build && \
     cmake --build build
-
 # Default command (run calculator)
 CMD ["./build/calculator"]

@@ -1,14 +1,16 @@
+# Use official GCC image
 FROM gcc:13
 
+# Set working directory
 WORKDIR /app
 
-# Install CMake and Google Test
+# Install required dependencies
 RUN apt-get update && apt-get install -y \
     cmake \
     libgtest-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Build and install gtest manually (required on Debian)
+# Build Google Test
 RUN cd /usr/src/gtest && \
     cmake . && \
     make && \
@@ -17,8 +19,9 @@ RUN cd /usr/src/gtest && \
 # Copy project files
 COPY . .
 
-# Build project
-RUN mkdir build && cd build && cmake .. && make
+# Build the project using modern CMake syntax
+RUN cmake -S . -B build && \
+    cmake --build build
 
-# Run calculator
+# Default command (run calculator)
 CMD ["./build/calculator"]

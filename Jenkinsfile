@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "bhautik03/scientific-calculator"
-        IMAGE_TAG  = "${BUILD_NUMBER}"   // dynamic tagging
+        IMAGE_TAG  = "${BUILD_NUMBER}"
     }
 
     stages {
@@ -73,48 +73,17 @@ pipeline {
 
         success {
             emailext(
-                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-Hello,
-
-Your Jenkins pipeline completed successfully.
-
-Job Name      : ${env.JOB_NAME}
-Build Number  : ${env.BUILD_NUMBER}
-Status        : SUCCESS
-Docker Image  : ${IMAGE_NAME}:${IMAGE_TAG}
-
-Build URL:
-${env.BUILD_URL}
-
-Regards,
-Jenkins
-""",
-                to: "bhautikv03@gmail.com",
-                attachLog: true
+                subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Build SUCCESS.\n\n${env.BUILD_URL}",
+                to: "bhautikv03@gmail.com"
             )
         }
 
         failure {
             emailext(
-                subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-Hello,
-
-Your Jenkins pipeline has FAILED.
-
-Job Name     : ${env.JOB_NAME}
-Build Number : ${env.BUILD_NUMBER}
-Status       : FAILURE
-
-Check logs here:
-${env.BUILD_URL}
-
-Regards,
-Jenkins
-""",
-                to: "bhautikv03@gmail.com",
-                attachLog: true
+                subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: "Build FAILED.\n\n${env.BUILD_URL}",
+                to: "bhautikv03@gmail.com"
             )
         }
     }

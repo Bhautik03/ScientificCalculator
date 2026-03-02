@@ -2,7 +2,8 @@ pipeline {
     agent any
 
     options {
-        skipDefaultCheckout(true)   // ✅ prevents automatic checkout
+        skipDefaultCheckout(true)
+        //timestamps()
     }
 
     environment {
@@ -21,24 +22,47 @@ pipeline {
         stage('Tool Check') {
             steps {
                 sh '''
+                    echo "Checking installed tools..."
+                    cmake --version
                     docker --version
                     ansible --version
                 '''
             }
         }
 
-        stage('Docker Build') {
+        stage('Build (CMake)') {
             steps {
                 sh '''
-                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    rm -rf build
+                    mkdir build
+                    cd build
+                    cmake ..
+                    make
                 '''
             }
         }
 
-        stage('Run Tests in Container') {
+        stage('Test') {
             steps {
                 sh '''
-                    docker run --rm ${IMAGE_NAME}:${IMAGE_TAG} ctest --test-dir build
+                    cd build
+                    ctest --output-on-failure
+                '''
+            }
+        }
+
+        stage('Docker Diagnostics') {
+            steps {
+                sh '''
+                    docker images | grep scientific-calculator || true
+                '''
+            }
+        }
+
+        stage('Docker Build Image') {
+            steps {
+                sh '''
+                    docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
             }
         }
@@ -78,7 +102,7 @@ pipeline {
         success {
             emailext(
                 subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build SUCCESS.",
+                body: "Build and deployment successful.",
                 to: "bhautikv03@gmail.com"
             )
         }
@@ -86,7 +110,7 @@ pipeline {
         failure {
             emailext(
                 subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build FAILED.",
+                body: "Build or deployment failed. Check logs.",
                 to: "bhautikv03@gmail.com"
             )
         }

@@ -1,10 +1,8 @@
-# Use official GCC image
-FROM gcc:13
+# -------- Build Stage --------
+FROM gcc:13 AS builder
 
-# Set working directory
 WORKDIR /app
 
-# Install required dependencies
 RUN apt-get update && apt-get install -y \
     cmake \
     libgtest-dev \
@@ -16,14 +14,17 @@ RUN cd /usr/src/gtest && \
     make && \
     cp lib/*.a /usr/lib
 
-# Copy project files
 COPY . .
 
-# 🔴 IMPORTANT FIX: remove Jenkins-generated CMake artifacts
-RUN rm -rf build CMakeCache.txt CMakeFiles
-
-# Build the project using modern CMake syntax
+RUN rm -rf build
 RUN cmake -S . -B build && \
     cmake --build build
-# Default command (run calculator)
-CMD ["./build/calculator"]
+
+# -------- Runtime Stage --------
+FROM debian:bookworm-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/build/calculator ./calculator
+
+CMD ["./calculator"]

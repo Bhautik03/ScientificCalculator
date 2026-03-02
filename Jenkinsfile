@@ -3,24 +3,26 @@ pipeline {
 
     options {
         skipDefaultCheckout(true)
-        //timestamps()
     }
 
     environment {
         IMAGE_NAME = "bhautik03/scientific-calculator"
         IMAGE_TAG  = "${BUILD_NUMBER}"
+        FAILED_STAGE = ""
     }
 
     stages {
 
         stage('Checkout SCM') {
             steps {
+                script { env.FAILED_STAGE = "Checkout SCM" }
                 checkout scm
             }
         }
 
         stage('Tool Check') {
             steps {
+                script { env.FAILED_STAGE = "Tool Check" }
                 sh '''
                     echo "Checking installed tools..."
                     cmake --version
@@ -32,6 +34,7 @@ pipeline {
 
         stage('Build (CMake)') {
             steps {
+                script { env.FAILED_STAGE = "Build (CMake)" }
                 sh '''
                     rm -rf build
                     mkdir build
@@ -44,6 +47,7 @@ pipeline {
 
         stage('Test') {
             steps {
+                script { env.FAILED_STAGE = "Test" }
                 sh '''
                     cd build
                     ctest --output-on-failure
@@ -53,14 +57,16 @@ pipeline {
 
         stage('Docker Diagnostics') {
             steps {
+                script { env.FAILED_STAGE = "Docker Diagnostics" }
                 sh '''
                     docker images | grep scientific-calculator || true
                 '''
             }
         }
 
-        stage('Docker Build Image') {
+        stage('Build Image') {
             steps {
+                script { env.FAILED_STAGE = "Docker Build Image" }
                 sh '''
                     docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
                 '''
@@ -69,6 +75,7 @@ pipeline {
 
         stage('Push Image') {
             steps {
+                script { env.FAILED_STAGE = "Push Image" }
                 withCredentials([usernamePassword(
                     credentialsId: 'dockerhub-creds',
                     usernameVariable: 'DOCKER_USER',
@@ -87,6 +94,7 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
+                script { env.FAILED_STAGE = "Deploy with Ansible" }
                 sh '''
                     ansible-playbook -i inventory deploy.yml
                 '''
@@ -102,7 +110,7 @@ pipeline {
         success {
             emailext(
                 subject: "SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build and deployment successful.",
+                body: "Build and Deployment Successful!",
                 to: "bhautikv03@gmail.com"
             )
         }
@@ -110,7 +118,14 @@ pipeline {
         failure {
             emailext(
                 subject: "FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: "Build or deployment failed. Check logs.",
+                body: """
+                Build or Deployment FAILED!
+
+                Job: ${env.JOB_NAME}
+                Build Number: ${env.BUILD_NUMBER}
+
+                Failed Stage: ${env.FAILED_STAGE}
+                """,
                 to: "bhautikv03@gmail.com"
             )
         }

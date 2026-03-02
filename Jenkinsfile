@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "bhautik03/scientific-calculator"
-        IMAGE_TAG  = "latest"
+        IMAGE_TAG  = "${BUILD_NUMBER}"   // dynamic tagging
     }
 
     stages {
@@ -49,6 +49,8 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
                         docker push ${IMAGE_NAME}:${IMAGE_TAG}
+                        docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+                        docker push ${IMAGE_NAME}:latest
                         docker logout
                     '''
                 }
@@ -57,7 +59,9 @@ pipeline {
 
         stage('Deploy with Ansible') {
             steps {
-                sh 'ansible-playbook -i inventory deploy.yml'
+                sh '''
+                    ansible-playbook -i inventory deploy.yml
+                '''
             }
         }
     }
@@ -65,6 +69,53 @@ pipeline {
     post {
         always {
             cleanWs()
+        }
+
+        success {
+            emailext(
+                subject: "✅ SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Hello,
+
+Your Jenkins pipeline completed successfully.
+
+Job Name      : ${env.JOB_NAME}
+Build Number  : ${env.BUILD_NUMBER}
+Status        : SUCCESS
+Docker Image  : ${IMAGE_NAME}:${IMAGE_TAG}
+
+Build URL:
+${env.BUILD_URL}
+
+Regards,
+Jenkins
+""",
+                to: "bhautikv03@gmail.com",
+                attachLog: true
+            )
+        }
+
+        failure {
+            emailext(
+                subject: "❌ FAILURE: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                body: """
+Hello,
+
+Your Jenkins pipeline has FAILED.
+
+Job Name     : ${env.JOB_NAME}
+Build Number : ${env.BUILD_NUMBER}
+Status       : FAILURE
+
+Check logs here:
+${env.BUILD_URL}
+
+Regards,
+Jenkins
+""",
+                to: "bhautikv03@gmail.com",
+                attachLog: true
+            )
         }
     }
 }

@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout(true)
-    }
-
     environment {
         IMAGE_NAME = "bhautik03/scientific-calculator"
         IMAGE_TAG  = "${BUILD_NUMBER}"
@@ -32,6 +28,13 @@ pipeline {
             }
         }
 
+        stage('Checkout') { 
+            steps { 
+                script { env.FAILED_STAGE = "Checkout" } 
+                checkout scm 
+            } 
+        }
+
         stage('Build (CMake)') {
             steps {
                 script { env.FAILED_STAGE = "Build (CMake)" }
@@ -51,15 +54,6 @@ pipeline {
                 sh '''
                     cd build
                     ctest --output-on-failure
-                '''
-            }
-        }
-
-        stage('Docker Diagnostics') {
-            steps {
-                script { env.FAILED_STAGE = "Docker Diagnostics" }
-                sh '''
-                    docker images | grep scientific-calculator || true
                 '''
             }
         }

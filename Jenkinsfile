@@ -1,7 +1,7 @@
 pipeline {
 agent any
 
-```
+
 environment {
     IMAGE_NAME = "bhautik03/scientific-calculator"
     IMAGE_TAG  = "${BUILD_NUMBER}"
@@ -133,6 +133,5 @@ post {
         )
     }
 }
-```
 
 }

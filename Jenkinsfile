@@ -8,14 +8,6 @@ pipeline {
     }
 
     stages {
-
-        stage('Checkout SCM') {
-            steps {
-                script { env.FAILED_STAGE = "Checkout SCM" }
-                checkout scm
-            }
-        }
-
         stage('Tool Check') {
             steps {
                 script { env.FAILED_STAGE = "Tool Check" }

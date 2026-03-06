@@ -1,8 +1,13 @@
 ---
 - hosts: localhost
   tasks:
-    - name: Pull Docker Image
-      command: docker pull bhautik03/scientific-calculator
 
-    - name: Run Docker Container
-      command: docker run -d bhautik03/scientific-calculator
+    - name: Pull latest Docker image
+      command: docker pull bhautik03/scientific-calculator:latest
+
+    - name: Stop existing container
+      command: docker rm -f calculator_container
+      ignore_errors: yes
+
+    - name: Run new container
+      command: docker run -d --name calculator_container bhautik03/scientific-calculator:latest

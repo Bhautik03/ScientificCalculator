@@ -36,10 +36,6 @@ pipeline {
                     else
                         echo "Google Test already installed"
                     fi
-
-                    # Verify Docker and Ansible
-                    docker --version
-                    ansible --version
                 '''
             }
         }

@@ -10,4 +10,4 @@
       ignore_errors: yes
 
     - name: Run new container
-      command: docker run -d --name calculator_container bhautik03/scientific-calculator:latest
+      command: docker run -d --name calculator_container bhautik03/scientific-calculator:latest  
